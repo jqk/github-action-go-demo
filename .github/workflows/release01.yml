@@ -1,34 +1,49 @@
 # This workflow will build a golang project
 # For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-go
 
-name: Release01
+# 这是显示在 github 页面上的 action 名称，可以与文件名不同。
+name: create release
 
 on:
   push:
     tags:
+      # 只当标签名为 v... 时触发，可以进一步约定为 v*.*.* 以更严格地定义。
       - "v*"
 
 jobs:
 
   build-windows:
-    #if: startsWith(github.ref, 'refs/tags/')
+    # 如果前面未对标签名过程，此处将判断是否签入了标签。若否，则放弃执行。
+    # if: startsWith(github.ref, 'refs/tags/')
+
+    # 可以在多个操作系统上执行。如果直接指定了操作系统，则下面的 matrix.os 定义是用不上的。
     # runs-on: ${{ matrix.os }}
     runs-on: ubuntu-latest
+
+    # 必须设置为 write，否则会因为权限原因无法上传编译后的文档。
     permissions:
       contents: write
+      
     strategy:
       matrix:
-      #  os: [ubuntu-latest]
-      #  goarch: [amd64]
-      #  goos: [windows]
+        # 也可以这样定义，但当前文件中的格式虽冗长，但更灵活。
+        #  os: [ubuntu-latest]
+        #  goarch: [amd64]
+        #  goos: [windows]
+
+        # 定义可执行程序名，不含扩展名。
+        artifactname: "demo"
+        goarch: amd64
+
+        # 定义与具体操作系统相关的变量。
         include:
-          - goarch: amd64
-            goos: linux
-            goext: ""
+          - goos: linux
+            # 定义文件扩展名
+            artifactext: ""
+            # 定义执行 github action 的操作系统，如前面已写死，则此处不起作用。
             os: ubuntu-latest
-          - goarch: arm64
-            goos: windows
-            goext: ".exe"
+          - goos: windows
+            artifactext: ".exe"
             os: windows-latest
 
     steps:
@@ -36,7 +51,9 @@ jobs:
       uses: actions/checkout@v3
     
     - name: Get version
+      # 此处的 id 在后面有所引用，所以必须定义。    
       id: get_version
+      # 注意，若在 Windows 中运行，则 >> 后应为 $Env:GITHUB_OUTPUT。否则等到的版本号没存到环境变量中。
       run: echo "VERSION=$(git tag --points-at HEAD)" >> $GITHUB_OUTPUT
     
     - name: Set up Go
@@ -45,15 +62,17 @@ jobs:
         go-version: '>=1.19.0'
         cache: true
 
-    - name: Build exe
-      run: go build -o demo${{ matrix.goext }}
+    - name: Build artifact
+      # 此处使用前面定义的不同操作系统中所生成程序的扩展名。
+      run: go build -o ${{ artifactname }}${{ matrix.artifactext }}
       env:
         GOOS: ${{ matrix.goos }}
         GOARCH: ${{ matrix.goarch }}
         CGO_ENABLED: 0
 
     - name: Packaging...
-      run: tar czf demo-${{ matrix.goos }}-${{ steps.get_version.outputs.VERSION }}.tgz demo${{ matrix.goext }}
+      # 即使在 windows 中执行 github action，也不需要提前安装 tar，已内置。
+      run: tar czf ${{ artifactname }}-${{ matrix.goos }}-${{ steps.get_version.outputs.VERSION }}.tgz demo${{ matrix.artifactext }}
 
     - name: Uploading artifact
       uses: softprops/action-gh-release@v1
