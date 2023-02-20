@@ -31,20 +31,21 @@ jobs:
         #  goarch: [amd64]
         #  goos: [windows]
 
-        # 定义可执行程序名，不含扩展名。
-        artifactname: "demo"
-        goarch: amd64
-
-        # 定义与具体操作系统相关的变量。
+        # 定义生成目标的操作系统的相关变量，即使有重复，也要分别定义，如 goarch。
         include:
           - goos: linux
             # 定义文件扩展名
             artifactext: ""
             # 定义执行 github action 的操作系统，如前面已写死，则此处不起作用。
             os: ubuntu-latest
+            # 定义可执行程序名，不含扩展名。
+            artifactname: "demo"
+            goarch: amd64
           - goos: windows
             artifactext: ".exe"
             os: windows-latest
+            artifactname: "demo"
+            goarch: amd64
 
     steps:
     - name: Checkout
