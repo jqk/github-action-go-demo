@@ -12,14 +12,16 @@ on:
 
 jobs:
 
-  build-windows:
-    # 如果前面未对标签名过程，此处将判断是否签入了标签。若否，则放弃执行。
+  build-and-release:
+    # 如果前面未对标签名进行验证，此处将判断是否签入了标签。若否，则放弃执行。
     # if: startsWith(github.ref, 'refs/tags/')
 
-    # 可以在多个操作系统上执行。如果直接指定了操作系统，则下面的 matrix.os 定义是用不上的。
-    runs-on: ${{ matrix.os }}
+    # 可以在多个操作系统上执行。如果直接指定了操作系统，则不会使用下面的 matrix.os 定义。
+    # runs-on: ${{ matrix.os }}
+    
     # 也可以直接指定执行环境的操作系统。即使是 linux，也可以发布 windows 程序。
-    # runs-on: ubuntu-latest
+    # linux 下的运行速度明显快于 windows。
+    runs-on: ubuntu-latest
 
     # 必须设置为 write，否则会因为权限原因无法上传编译后的文档。
     permissions:
@@ -46,7 +48,9 @@ jobs:
           - goos: windows
             artifactext: ".exe"
             os: windows-latest
-            outputenv: "$Env:GITHUB_OUTPUT"
+            # 如果在 windows 下运行，环境变量前要加上 $Env。
+            # outputenv: "$Env:GITHUB_OUTPUT"
+            outputenv: "$GITHUB_OUTPUT"
             # 因为不同平台用的内容相同，所以也可以使用 env 定义在外层，但集中一起更直观。
             artifactname: "demo"
             goarch: amd64
