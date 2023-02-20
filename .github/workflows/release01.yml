@@ -65,7 +65,7 @@ jobs:
 
     - name: Build artifact
       # 此处使用前面定义的不同操作系统中所生成程序的扩展名。
-      run: go build -o ${{ artifactname }}${{ matrix.artifactext }}
+      run: go build -o ${{ matrix.artifactname }}${{ matrix.artifactext }}
       env:
         GOOS: ${{ matrix.goos }}
         GOARCH: ${{ matrix.goarch }}
@@ -73,7 +73,7 @@ jobs:
 
     - name: Packaging...
       # 即使在 windows 中执行 github action，也不需要提前安装 tar，已内置。
-      run: tar czf ${{ artifactname }}-${{ matrix.goos }}-${{ steps.get_version.outputs.VERSION }}.tgz demo${{ matrix.artifactext }}
+      run: tar czf ${{ matrix.artifactname }}-${{ matrix.goos }}-${{ steps.get_version.outputs.VERSION }}.tgz demo${{ matrix.artifactext }}
 
     - name: Uploading artifact
       uses: softprops/action-gh-release@v1
