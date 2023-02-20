@@ -46,8 +46,12 @@ jobs:
       run: tar czf demo-${{ matrix.goos }}-${{ steps.get_version.outputs.VERSION }}.tgz demo.exe
 
     - name: Uploading artifact
-      uses: softprops/action-gh-release@v1
-      with:
-          files: |
-            *.tgz
-            README.md
+    - uses: actions/upload-artifact@v3
+        with:
+          name: demo-${{ matrix.goos }}-${{ steps.get_version.outputs.VERSION }}.tgz
+          
+    # uses: softprops/action-gh-release@v1
+    # with:
+    #     files: |
+    #       *.tgz
+    #       README.md
