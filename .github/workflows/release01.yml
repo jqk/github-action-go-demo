@@ -18,8 +18,15 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest]
-        goarch: [amd64]
-        goos: [windows]
+      #  goarch: [amd64]
+      #  goos: [windows]
+        include:
+          - goarch: amd64
+            goos: linux
+            goext: ""
+          - goarch: arm64
+            goos: windows
+            goext: ".exe"
 
     steps:
     - name: Checkout
@@ -36,23 +43,18 @@ jobs:
         cache: true
 
     - name: Build exe
-      run: go build -o demo.exe
+      run: go build -o demo${{ matrix.goext }}
       env:
         GOOS: ${{ matrix.goos }}
         GOARCH: ${{ matrix.goarch }}
         CGO_ENABLED: 0
 
     - name: Packaging...
-      run: tar czf demo-${{ matrix.goos }}-${{ steps.get_version.outputs.VERSION }}.tgz demo.exe
+      run: tar czf demo-${{ matrix.goos }}-${{ steps.get_version.outputs.VERSION }}.tgz demo${{ matrix.goext }}
 
     - name: Uploading artifact
-      uses: actions/upload-artifact@v3
+      uses: softprops/action-gh-release@v1
       with:
-        name: my-artifact
-        path: demo-${{ matrix.goos }}-${{ steps.get_version.outputs.VERSION }}.tgz
-          
-    # uses: softprops/action-gh-release@v1
-    # with:
-    #     files: |
-    #       *.tgz
-    #       README.md
+        files: |
+          *.tgz
+          README.md
