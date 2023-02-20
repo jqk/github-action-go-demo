@@ -2,7 +2,7 @@
 # For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-go
 
 # 这是显示在 github 页面上的 action 名称，可以与文件名不同。
-name: create release
+name: build and release
 
 on:
   push:
@@ -17,8 +17,9 @@ jobs:
     # if: startsWith(github.ref, 'refs/tags/')
 
     # 可以在多个操作系统上执行。如果直接指定了操作系统，则下面的 matrix.os 定义是用不上的。
-    # runs-on: ${{ matrix.os }}
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
+    # 也可以直接指定执行环境的操作系统。即使是 linux，也可以发布 windows 程序。
+    # runs-on: ubuntu-latest
 
     # 必须设置为 write，否则会因为权限原因无法上传编译后的文档。
     permissions:
@@ -38,12 +39,15 @@ jobs:
             artifactext: ""
             # 定义执行 github action 的操作系统，如前面已写死，则此处不起作用。
             os: ubuntu-latest
+            outputenv: "$GITHUB_OUTPUT"
             # 定义可执行程序名，不含扩展名。
             artifactname: "demo"
             goarch: amd64
           - goos: windows
             artifactext: ".exe"
             os: windows-latest
+            outputenv: "$Env:GITHUB_OUTPUT"
+            # 因为不同平台用的内容相同，所以也可以使用 env 定义在外层，但集中一起更直观。
             artifactname: "demo"
             goarch: amd64
 
