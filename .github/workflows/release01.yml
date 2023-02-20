@@ -45,7 +45,9 @@ jobs:
     - name: Packaging...
       run: tar czf demo-${{ matrix.goos }}-${{ steps.get_version.outputs.VERSION }}.tgz demo.exe
 
-    - uses: ncipollo/release-action@v1
+    - name: Uploading artifact
+      uses: softprops/action-gh-release@v1
       with:
-        artifacts: "*.tgz"
-        bodyFile: "README.md"
+          files: |
+            *.tgz
+            README.md
