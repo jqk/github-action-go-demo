@@ -59,7 +59,7 @@ jobs:
       # 此处的 id 在后面有所引用，所以必须定义。    
       id: get_version
       # 注意，若在 Windows 中运行，则 >> 后应为 $Env:GITHUB_OUTPUT。否则等到的版本号没存到环境变量中。
-      run: echo "VERSION=$(git tag --points-at HEAD)" >> ${{ outputenv }}
+      run: echo "VERSION=$(git tag --points-at HEAD)" >> ${{ matrix.outputenv }}
     
     - name: Set up Go
       uses: actions/setup-go@v3
