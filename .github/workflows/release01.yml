@@ -46,7 +46,7 @@ jobs:
       run: tar czf demo-${{ matrix.goos }}-${{ steps.get_version.outputs.VERSION }}.tgz demo.exe
 
     - name: Uploading artifact
-    - uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v3
       with:
         name: my-artifact
         path: demo-${{ matrix.goos }}-${{ steps.get_version.outputs.VERSION }}.tgz
