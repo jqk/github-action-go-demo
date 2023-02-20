@@ -24,6 +24,13 @@ jobs:
     - name: Check out
       uses: actions/checkout@v3
 
+    - name: Set up Go
+      uses: actions/setup-go@v3
+      with:
+        go-version: '>=1.19.0'
+        cache: true
+
+    # 必须在 set up go 之后，否则缺少 go.sum?
     - name: Get version
       id: get_version
       # ::set-output is deprecated, see https://github.blog/changelog/2022-10-11-github-actions-deprecating-save-state-and-set-output-commands
@@ -32,12 +39,6 @@ jobs:
       # run: echo "VERSION=$(git tag --points-at HEAD)" >> $GITHUB_OUTPUT
 
       run: echo "VERSION=${GITHUB_REF#refs/*/}" >> $GITHUB_OUTPUT
-
-    - name: Set up Go
-      uses: actions/setup-go@v3
-      with:
-        go-version: '>=1.19.0'
-        cache: true
 
     - name: Build
       run: go build -v ./...
