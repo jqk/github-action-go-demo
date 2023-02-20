@@ -6,7 +6,7 @@ name: Release01
 on:
   push:
     tags:
-      - "[V|v].*"
+      - "v*"
 
 jobs:
 
